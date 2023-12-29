@@ -1,0 +1,52 @@
+import os
+import shutil
+import random
+
+# Set paths
+source_dir = "C:/Users/rayso_sq9ff/Downloads/fruit/train/train"  # Path to your original data directory
+train_dir = "C:/Users/rayso_sq9ff/Desktop/try/train"  # Path to the training data directory
+test_dir = "C:/Users/rayso_sq9ff/Desktop/try/test"  # Path to the testing data directory
+valid_dir = "C:/Users/rayso_sq9ff/Desktop/try/valid"  # Path to the validation data directory
+
+# Create target directories
+os.makedirs(train_dir, exist_ok=True)
+os.makedirs(test_dir, exist_ok=True)
+os.makedirs(valid_dir, exist_ok=True)
+
+# Get all files
+files = os.listdir(source_dir)
+
+# Process each folder
+for file in files:
+    file_path = os.path.join(source_dir, file)
+
+    # If it is a folder
+    if os.path.isdir(file_path):
+        images = os.listdir(file_path)
+        random.shuffle(images)
+
+        # Calculate the number of images to allocate to each set
+        total_images = len(images)
+        train_size = int(0.7 * total_images)
+        test_size = int(0.2 * total_images)
+        valid_size = total_images - train_size - test_size
+
+        # Create target folders
+        train_file_path = os.path.join(train_dir, file)
+        test_file_path = os.path.join(test_dir, file)
+        valid_file_path = os.path.join(valid_dir, file)
+        os.makedirs(train_file_path, exist_ok=True)
+        os.makedirs(test_file_path, exist_ok=True)
+        os.makedirs(valid_file_path, exist_ok=True)
+
+        # Rename and allocate images to each set
+        for i, image in enumerate(images, start=1):
+            image_path = os.path.join(file_path, image)
+            new_image_name = str(i) + os.path.splitext(image)[1]
+
+            if i <= train_size:
+                shutil.copy(image_path, os.path.join(train_file_path, new_image_name))
+            elif i <= train_size + test_size:
+                shutil.copy(image_path, os.path.join(test_file_path, new_image_name))
+            else:
+                shutil.copy(image_path, os.path.join(valid_file_path, new_image_name))
